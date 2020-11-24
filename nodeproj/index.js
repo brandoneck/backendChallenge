@@ -1,14 +1,21 @@
-console.log("Oh Yeah!")
-const express = require('express')
-const dataUsers = require('./database/users')
-const md5 = require('md5')
+const express = require('express');
+const dataUsers = require('./database/users');
+const dataCursos = require('./database/cursos');
+const md5 = require('md5');
+const jwt = require("jsonwebtoken");
+
+//body parser
+var bodyParser = require('body-parser');
+var jsonParser = bodyParser.json();
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 //Swagger
-const swaggerJsDoc = require('swagger-jsdoc')
-const swaggerUI = require('swagger-ui-express')
-const app = express()
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUI = require('swagger-ui-express');
+const app = express();
 
 dataUsers.initializeMongo();
+// dataCursos.initializeMongo();
 
 app.get('/', function (req, res) {
   res.send('Hello World!')
@@ -16,95 +23,123 @@ app.get('/', function (req, res) {
 })
 
 
-///SWAGGER
+// ///////////SWAGGER
+const swaggerOptions = {
+  swaggerDefinition : {
+    info: {
+      title: 'Library API',
+      version: '1.0.0',
+      description: 'Documentation of API of the Challenge'
+      }
+    },
+    apis:  ['index.js'],
+    // host,
+    // basePath: '/',
+  };
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+console.log(swaggerDocs);
 
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
-// const swaggerOptions = {
-//   swaggerDefinition : {
-//     info: {
-//       title: 'Library API',
-//       version: '1.0.0'
-//       // description: 'work work work'
-//     },
-//     apis: ['index.js']
-//     // host,
-//     // basePath: '/',
-//   }
-// }
-// const swaggerDocs = swaggerJsDoc(swaggerOptions);
-// app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
-
-// /** 
-// *@swagger
-// * /books: 
-// *   get:
-// *     description: Get users
-// *     responses:
-// *       200:
-// *        description: Success
-// *
-// *
-// */
-
-
-// app.get('/books', (req, res) =>{
-//   res.send([
-//     {
-//       id: 1,
-//       title: 'Harry Potter'
-//     }
-//   ])
-// })
+/** 
+* @swagger
+* /addUser: 
+*   post:
+*     summary: Creates a new user
+*       
+*     responses:
+*       200:
+*        description: Success
+*
+*/
 
 
 /////////////////////////INSERT USER/////////////////////////
 
-app.get('/addUser/:name/:mail/:password', function (req, res) {
+app.post('/addUser', urlencodedParser, function (req, res) {
+  // res.send('welcome, ' + req.body.name);
 
-  dataUsers.addUser( req.params.name, req.params.mail, md5(req.params.password))
+
+  dataUsers.addUser(req.body.name, req.body.mail, md5(req.body.password))
   res.send({
-    name: req.params.name,
-    mail: req.params.mail,
-    password: md5(req.params.password),
+    name: req.body.name,
+    mail: req.body.mail,
+    // password: md5( req.body.password ),
+    password: req.body.password,
+
   });
 })
 
 app.listen(3001, function () {
-  console.log('Example app listening on port 3000!')
+  console.log('Example app listening on port 3001!')
 })
 
 
 // /////////////////////////LOGIN USER/////////////////////////
 
-app.get('/login/:mail/:password', function (req, res) {
+app.post('/login', urlencodedParser, function (req, res) {
 
-  dataUsers.User.find({"correo": req.params.mail, "contraseña": md5(req.params.password)}, function (err, usr) {
-
+  dataUsers.User.find({ "correo": req.body.mail, "contraseña": md5( req.body.password) }, function (err, usr) {
     if (err) res.status(500).send({ error: err });
-
     if (usr.length > 0) {
       res.status(200).send;
-      console.log('si');
-      res.send("Success");
+      // console.log('si');
+
+      ////////////////SENDING TOKEN/////////////////
+      jwt.sign({ user: req.body.mail }, 'secretKey', (err, token) => {
+        res.json({
+          token
+        });
+      });
     }
     else {
       res.status(401).send;
-      console.log('no');
-      res.send("Wrong");
     }
-    // console.log(usr);
-    // res.json(usr);
+  });
+});
+
+/////////////////////TOKEN REQUEST//////////////////
+app.post("/posts", verifyToken, (req, res) => {
+
+  jwt.verify(req.token, 'secretKey', (error, authData) => {
+
+    if (error) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        mensaje: "Post fue creado",
+        // authData: authData
+      });
+    }
   })
-
-  // res.send({
-  //   mail: req.params.mail,
-  //   password: md5(req.params.password),
-  // });
-  
-  // dataUsers.login( req.params.mail, md5(req.params.password))
-   
- })
+});
 
 
+////////////VERIFY TOKEN//////////////
+// Authorization: Bearer <token>
+function verifyToken(req, res, next) {
+  const bearerHeader = req.headers['authorization'];
 
- 
+  if (typeof bearerHeader !== 'undefined') {
+    const bearerToken = bearerHeader.split(" ")[1];
+    req.token = bearerToken;
+    next();
+  }
+  else {
+    //  res.send('no pasa');
+    res.sendStatus(403);
+  }
+}
+
+
+// /////////////////////////INSERT CURSOS/////////////////////////
+
+app.post('/addCurso', urlencodedParser, function (req, res) {
+
+  dataCursos.addCurso(req.body.nombreCurso, req.body.link, req.body.descripcion )
+  res.send({
+    name: req.body.nombreCurso,
+    mail: req.body.link,
+    password: req.body.descripcion,
+  });
+})
