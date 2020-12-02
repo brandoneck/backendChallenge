@@ -6,6 +6,7 @@ var userSchema = mongoose.Schema({
   nombre: String,
   correo: String,
   contraseña: String,
+  cursos: Array,
 });
 
 User = exports.User = mongoose.model('User', userSchema);
@@ -35,6 +36,16 @@ exports.addUser = function(name, mail, password) {
     console.log('There is a new user');
   });
 }
+
+
+exports.getUser = function() {
+  
+  DATABASE_CONECTION.collection('users').find().toArray(function(e, d) {
+    console.log(d.length);
+    db.close();
+});
+}
+
 
 
 
