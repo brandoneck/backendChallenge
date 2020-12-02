@@ -6,6 +6,8 @@ const dataEntrenamiento = require('./database/entrenamientos');
 const md5 = require('md5');
 const jwt = require("jsonwebtoken");
 const cors = require('cors');
+// const winston = require('winston');
+const logger = require('./utils/logger');
 
 //body parser
 var bodyParser = require('body-parser');
@@ -23,7 +25,8 @@ dataUsers.initializeMongo();
 // dataCursos.initializeMongo();
 
 app.get('/', function (req, res) {
-  res.send('Hello World!')
+  res.send('Hello World!');
+  logger.info('Server running');
 
 })
 
@@ -141,12 +144,12 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 */
 
 app.listen(3001, function () {
-  console.log('Listening on port 3001!')
+  logger.info('Listening on port 3001!');
 })
 
 /////////////////////////INSERT USER/////////////////////////
 
-app.post('/addUser', urlencodedParser, function (req, res) {
+app.post('/v2/addUser', urlencodedParser, function (req, res) {
   // res.send('welcome, ' + req.body.name);
 
 
@@ -158,10 +161,11 @@ app.post('/addUser', urlencodedParser, function (req, res) {
     // password: req.body.password,
 
   });
+  logger.info('user added');
 })
 
 
-app.get('/v2/addUser/:name/:mail/:password', function (req, res) {
+app.get('/v1/addUser/:name/:mail/:password', function (req, res) {
 
   dataUsers.addUser( req.params.name, req.params.mail, md5(req.params.password))
   res.send({
@@ -186,6 +190,7 @@ app.post('/getUsers', verifyToken, urlencodedParser, function (req, res) {
       dataUsers.User.find(function (e, usr) {
         res.send(usr);
         // console.log(usr);
+        logger.info('user list be sent');
       });
     }
   })
@@ -212,10 +217,13 @@ app.post('/login', urlencodedParser, function (req, res) {
           token, 
           id
         });
+        logger.info('user be logged');
       });
     }
     else {
-      res.status(401).send;
+      res.status(403).send;
+      console.log(err)
+      // logger.info('user cannot be logged');
     }
   });
 });
