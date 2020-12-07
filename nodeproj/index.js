@@ -144,7 +144,7 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 */
 
 app.listen(3001, function () {
-  logger.info('Listening on port 3001!');
+  // logger.info('Listening on port 3001!');
 })
 
 /////////////////////////INSERT USER/////////////////////////
@@ -178,22 +178,39 @@ app.get('/v1/addUser/:name/:mail/:password', function (req, res) {
 
 /////////////////////////GET USERS/////////////////////////
 
-app.post('/getUsers', verifyToken, urlencodedParser, function (req, res) {
+// app.post('/getUsers', verifyToken, urlencodedParser, function (req, res) {
 
-  jwt.verify(req.token, 'secretKey', (error, authData) => {
+//   jwt.verify(req.token, 'secretKey', (error, authData) => {
 
-    if (error) {
-      res.sendStatus(403);
-    } else {
+//     if (error) {
+//       logger.info(error);
+//       res.sendStatus(403);
+//     } else {
 
-      /////GETTING USERS//////////
+//       /////GETTING USERS//////////
+//       dataUsers.User.find(function (e, usr) {
+//         res.send(usr);
+//         // console.log(usr);
+//         logger.info('user list be sent');
+//       });
+//     }
+//   })
+// })
+
+
+app.post('/getUsers', urlencodedParser, function (req, res) {
+
+
+  
       dataUsers.User.find(function (e, usr) {
-        res.send(usr);
+        // res.status(200).send(usr);
+        // res.status(200);
+        res.send(usr).status(200);
+
         // console.log(usr);
         logger.info('user list be sent');
       });
-    }
-  })
+    // }
 })
 
 // /////////////////////////LOGIN USER/////////////////////////
@@ -203,9 +220,13 @@ app.post('/login', urlencodedParser, function (req, res) {
   console.log(req.body.mail,req.body.password );
 
   dataUsers.User.find({ "correo": req.body.mail, "contraseña": req.body.password }, function (err, usr) {
-    if (err) res.status(500).send({ error: err });
+    if (err){
+      res.status(500).send({ error: err });
+      logger.info(err);
+    } 
     if (usr.length > 0) {
       res.status(200).send;
+      logger.info(res);
       // res.send(usr);
       // console.log('si');
       var id = usr[0]._id;
@@ -213,16 +234,16 @@ app.post('/login', urlencodedParser, function (req, res) {
       ////////////////SENDING TOKEN/////////////////
       jwt.sign({ user: req.body.mail }, 'secretKey', (err, token) => {
         // console.log(token, usr);
-        res.json({
+        res.status(200).json({
           token, 
           id
         });
-        logger.info('user be logged');
+        logger.info('user be logged').status(200);
       });
     }
     else {
-      res.status(403).send;
-      console.log(err)
+      res.status(403).send('Wrong mail or password');
+      // console.log(JSON.stringify(err));
       // logger.info('user cannot be logged');
     }
   });
@@ -277,55 +298,65 @@ app.post('/addCurso', urlencodedParser, function (req, res) {
 
 /////////////////////////GET CURSOS/////////////////////////
 
-app.post('/getCursos', verifyToken, urlencodedParser, function (req, res) {
+app.post('/getCursos', function (req, res) {
 
-  jwt.verify(req.token, 'secretKey', (error, authData) => {
+  // jwt.verify(req.token, 'secretKey', (error, authData) => {
 
-    if (error) {
-      res.sendStatus(403);
-    } else {
+  //   if (error) {
+  //     res.sendStatus(403);
+  //   } else {
 
       /////GETTING USERS//////////
       dataCursos.Curso.find(function (e, cur) {
-        res.send(cur);
+        res.send(cur).status(200);
         // console.log(usr);
       });
-    }
-  })
+    // }
+  // })
 })
 
 // /////////////////////////CRUD TIEMPOS/////////////////////////
 
-app.post('/addTiempos', urlencodedParser, function (req, res) {
+app.post('/addTiempos', verifyToken, urlencodedParser, function (req, res) {
 
-  dataTiemposInv.addTiempoInv(req.body.nombreUsuario, req.body.tipoCurso, req.body.dias, req.body.horas, req.body.minutos, req.body.nombreCurso ) 
-  res.send({
-    nombreUsuario: req.body.nombreUsuario,
-    tipoCurso: req.body.tipoCurso,
-    dias: req.body.dias,
-    horas: req.body.horas,
-    minutos: req.body.minutos,
-    nombreCurso: req.body.nombreCurso,
-  });
-})
-
-/////////////////////////GET TIEMPOS/////////////////////////
-
-app.post('/getTiempos', verifyToken, urlencodedParser, function (req, res) {
 
   jwt.verify(req.token, 'secretKey', (error, authData) => {
 
     if (error) {
+      logger.info(error);
       res.sendStatus(403);
     } else {
 
-      /////GETTING USERS//////////
+      dataTiemposInv.addTiempoInv(req.body.nombreUsuario, req.body.tipoCurso, req.body.dias, req.body.horas, req.body.minutos, req.body.nombreCurso)
+      res.send({
+        nombreUsuario: req.body.nombreUsuario,
+        tipoCurso: req.body.tipoCurso,
+        dias: req.body.dias,
+        horas: req.body.horas,
+        minutos: req.body.minutos,
+        nombreCurso: req.body.nombreCurso,
+      }).status(200);
+    }
+  })
+});
+
+/////////////////////////GET TIEMPOS/////////////////////////
+
+app.post('/getTiempos', function (req, res) {
+
+  // jwt.verify(req.token, 'secretKey', (error, authData) => {
+
+  //   if (error) {
+  //     res.sendStatus(403);
+  //   } else {
+
+      /////GETTING TIEMPOS//////////
       dataTiemposInv.TiempoInv.find(function (e, tim) {
         res.send(tim);
         // console.log(usr);
       });
-    }
-  })
+  //   }
+  // })
 })
 
 // /////////////////////////INSERT TIPO ENTRENAMIENTO/////////////////////////
@@ -343,3 +374,4 @@ app.post('/addEntrenamiento', urlencodedParser, function (req, res) {
   });
 })
 
+module.exports = app;
