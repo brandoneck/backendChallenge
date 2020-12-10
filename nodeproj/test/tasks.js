@@ -7,17 +7,13 @@ const { response } = require('express');
 const app = require('../index');
 const logger = require('../utils/logger');
 
-
-
 chai.use(chaiHttp);
-
-
 
 describe('Tasks Api', () => {
 
 
     /////////////GETTING USERS////////
-    describe("POST /getUsers", () => {
+    describe("GET /getUsers", () => {
         it("it should get the users list", () => {
             chai.request(app)
                 // .post('/getUsers')
@@ -44,12 +40,11 @@ describe('Tasks Api', () => {
 
                     done();
                 });
-
         });
     });
 
     /////////////GETTING USERS////////
-    describe("POST /getCursos", () => {
+    describe("GET /getCursos", () => {
         it("it should get the courses list", () => {
             chai.request(app)
                 .post('/getCursos')
@@ -63,10 +58,10 @@ describe('Tasks Api', () => {
     });
 
     /////////////GETTING USERS////////
-    describe("POST /getTiempos", () => {
+    describe("GET /getTiempos", () => {
         it("it should get the times list of the different courses", () => {
             chai.request(app)
-                .post('/getCursos')
+                .post('/getTiempos')
                 .end((err, response) => {
                     response.should.have.status(200);
                     response.body.should.be.a('array');
@@ -75,33 +70,32 @@ describe('Tasks Api', () => {
                 })
         })
     });
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYmF0bWFuQGJhdG1hbi5jb20iLCJpYXQiOjE2MDczNzk1NTB9.1hFedxZpYERJIux1sGG1-Q6NmoUO_jP5J9DyRHCnT7U";
 
-    /////////////CRUD TIMES////////
-    // describe("POST /addTiempos", () => {
-    //     it("it should insert the inverted time on a specific course", async () => {
-    //         chai.request(app)
-    //             .post('/addTiempos')
-    //             .type('form')
-    //             .set('content-type', 'application/x-www-form-urlencoded')
-    //             // .set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYmF0bWFuQGJhdG1hbi5jb20iLCJpYXQiOjE2MDczMTcyMjN9.9BqyksJmISJ42WJ0NBsNfprLSzdtuO8HiT1XpUW3WrQ')
-    //             .set( 'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiYmF0bWFuQGJhdG1hbi5jb20iLCJpYXQiOjE2MDczMTcyMjN9.9BqyksJmISJ42WJ0NBsNfprLSzdtuO8HiT1XpUW3WrQ' )
+    ///////////CRUD TIMES////////
+    describe("POST /addTiempos", () => {
+        it("it should insert the inverted time on a specific course",  () => {
+            chai.request(app)
+                .post('/addTiempos')
+                .type('form')
+                .set('Content-Type', 'application/x-www-form-urlencoded')
+                // .set( 'Authorization', 'Bearer ' + token )
+                .set({'Authorization': 'Bearer ' + token })
+                .send({
+                    nombreUsuario: 'Tu conciencia',
+                    tipoCurso: 'Talleres',
+                    dias: 0,
+                    horas: 2,
+                    minutos: 0,
+                    nombreCurso: 'Backend JavaScript'
+                })
+                .end((err, res) => {
+                    response.should.have.status(200);
+                    response.body.should.be.a('array');
 
-    //             .send({
-    //                 nombreUsuario: 'Tu conciencia',
-    //                 tipoCurso: 'Talleres',
-    //                 dias: 0,
-    //                 horas: 2,
-    //                 minutos: 0,
-    //                 nombreCurso: 'Backend JavaScript'
-    //             })
-    //             .end((err, response) => {
-    //                 // response.should.have.status(200);
-    //                 // response.body.should.be.a('array');
-    //                 logger.info(err);
-
-    //                 done();
-    //             })
-    //     })
-    // });
+                    done();
+                });
+        })
+    });
 
 });

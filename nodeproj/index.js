@@ -50,64 +50,74 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 
-/** 
+/**
 *@swagger
 *swagger: '2.0'
 *info:
-*  description: defaultDescription
+*  description: API Services
 *  version: '0.1'
-*  title: defaultTitle
+*  title: API Services
 *paths:
+*
+*
 *  /login:
 *    post:
 *      consumes:
-*        - application/json
-*      produces:
-*        - application/json
+*        - application/x-www-form-urlencoded
 *      parameters:
-*        - in: body
-*          name: body
-*          required: false
+*        - in: formData
+*          name: mail
+*          required: true
+*        - in: formData
+*          name: password
+*          required: true
 *          schema:
 *            $ref: '#/definitions/loginModel'
 *          x-examples:
-*            application/json: "{\r\n    \"mail\": \"Backend JavaScript\",\r\n    \"link\": \"hola123\"\r\n}"
+*            application/x-www-form-urlencoded: "{\r\n    \"mail\": \"batman@batman.com\",\r\n    \"password\": \"9450476b384b32d8ad8b758e76c98a69\"\r\n}"
 *      responses:
 *        '200':
 *          description: Success
 *        '403':
 *          description: Forbidden
-*  /addUser:
-*    post:
+*
+*
+*  /getUsers:
+*    get:
 *      consumes:
 *        - application/json
 *      produces:
 *        - application/json
-*      parameters:
-*        - in: body
-*          name: body
-*          required: false
-*          schema:
-*            $ref: '#/definitions/addUserModel'
-*          x-examples:
-*            application/json: "{\r\n    \"name\": \"Pruebaman\",\r\n    \"mail\": \"prueba@man.com\",\r\n    \"password\": \"prueba123\"\r\n}"
 *      responses:
 *        '200':
 *          description: Success
-*          schema:
-*            $ref: '#/definitions/addUserModel'
-*  /addCurso:
-*    post:
+*
+*
+*  /getCursos:
+*    get:
 *      consumes:
 *        - application/json
 *      produces:
 *        - application/json
+*      responses:
+*        '200':
+*          description: Success
+*
+*
+*  /addCurso:
+*    post:
+*      consumes:
+*        - application/x-www-form-urlencoded
 *      parameters:
-*        - in: body
-*          name: body
-*          required: false
-*          schema:
-*            $ref: '#/definitions/addCursoModel'
+*        - in: formData
+*          name: nombreCurso
+*          required: true
+*        - in: formData
+*          name: link
+*          required: true
+*        - in: formData
+*          name: descripcion
+*          required: true
 *          x-examples:
 *            application/json: "{\r\n    \"nombreCurso\": \"Backend JavaScript\",\r\n    \"link\": \"https://platzi.com/backend-javascript/?utm_source=google&utm_medium=cpc&utm_campaign=9581077849&utm_adgroup=93834209210&utm_content=430529219711&&gclid=CjwKCAiAnvj9BRA4EiwAuUMDf5vOkeUr8jm3DJHyTKxhyzX1GwIlOC0PuWNCyjIK7mxbWHuFfNjFXxoCfr8QAvD_BwE&gclsrc=aw.ds\",\r\n    \"descripcion\": \"En los últimos años JavaScript ha avanzado exponencialmente como lenguaje de programación. Como sabemos, JavaScript antes lo usábamos para agregar interacción a nuestras aplicaciones web, es decir, solo era ejecutado e interpretado por el navegador web, pero todo cambió gracias al lanzamiento de Node.js.\\nConoce los fundamentos con el Curso de Fundamentos de JavaScript\"\r\n}"
 *      responses:
@@ -115,7 +125,111 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 *          description: Success
 *          schema:
 *            $ref: '#/definitions/addCursoModel'
-
+*
+*
+*  /v1/addUser/{name}/{mail}/{password}:
+*    get:
+*      description: version 1 of add user request
+*      parameters:
+*        - in: path
+*          name: name
+*          required: true
+*        - in: path
+*          name: mail
+*          required: true
+*        - in: path
+*          name: password
+*          required: true
+*      responses:
+*        '200':
+*          description: Success
+*          content:
+*            application/json; charset=utf-8:
+*              schema:
+*                type: string
+*              examples: {}
+*      servers:
+*        - url: 'http://localhost:3001'
+*    servers:
+*      - url: 'http://localhost:3001'
+*
+*
+*  /v2/addUser:
+*    post:
+*      description: version 2 of add user request
+*      consumes:
+*        - application/x-www-form-urlencoded
+*      parameters:
+*        - in: formData
+*          name: name
+*          required: true
+*        - in: formData
+*          name: mail
+*          required: true
+*        - in: formData
+*          name: password
+*          required: true
+*      responses:
+*        '200':
+*          description: Success
+*          schema:
+*            $ref: '#/definitions/addUserModel'
+*        '404':
+*          description: Not Found
+*        '500':
+*          description: Error Internal Server Error
+*
+*
+*  /addTiempos :
+*    post:
+*      consumes:
+*        - application/x-www-form-urlencoded
+*      parameters:
+*        - in: formData
+*          name: nombreUsuario
+*          required: true
+*        - in: formData
+*          name: tipoCurso
+*          required: true
+*        - in: formData
+*          name: dias
+*          required: true
+*        - in: formData
+*          name: horas
+*          required: true
+*        - in: formData
+*          name: minutos
+*          required: true
+*        - in: formData
+*          name: nombreCurso
+*          required: true
+*        - in: header
+*          name: Authorization
+*          type: string
+*          required: true
+*          description: Bearer token
+*      responses:
+*        '200':
+*          description: Success
+*        '404':
+*          description: Not Found
+*        '500':
+*          description: Error Internal Server Error
+*          schema:
+*            $ref: '#/definitions/addUserModel'
+*
+*
+*  /getTiempos:
+*    get:
+*      consumes:
+*        - application/json
+*      produces:
+*        - application/json
+*      responses:
+*        '200':
+*          description: Success
+*
+*
 * definitions:
 *  loginModel:
 *    properties:
@@ -198,17 +312,15 @@ app.get('/v1/addUser/:name/:mail/:password', function (req, res) {
 // })
 
 
-app.post('/getUsers', urlencodedParser, function (req, res) {
+app.get('/getUsers', urlencodedParser, function (req, res) {
 
-
-  
       dataUsers.User.find(function (e, usr) {
         // res.status(200).send(usr);
         // res.status(200);
         res.send(usr).status(200);
 
         // console.log(usr);
-        logger.info('user list be sent');
+        logger.info('user list sent');
       });
     // }
 })
@@ -217,16 +329,16 @@ app.post('/getUsers', urlencodedParser, function (req, res) {
 
 app.post('/login', urlencodedParser, function (req, res) {
 
-  console.log(req.body.mail,req.body.password );
+  // console.log(req.body.mail,req.body.password );
 
-  dataUsers.User.find({ "correo": req.body.mail, "contraseña": req.body.password }, function (err, usr) {
+  dataUsers.User.find({ "correo": req.body.mail, "contraseña": md5(req.body.password) }, function (err, usr) {
     if (err){
       res.status(500).send({ error: err });
       logger.info(err);
     } 
     if (usr.length > 0) {
-      res.status(200).send;
-      logger.info(res);
+      // res.status(200).send;
+      // logger.info(res);
       // res.send(usr);
       // console.log('si');
       var id = usr[0]._id;
@@ -238,10 +350,11 @@ app.post('/login', urlencodedParser, function (req, res) {
           token, 
           id
         });
-        logger.info('user be logged').status(200);
+        logger.info('user be logged');
       });
     }
     else {
+      // logger.info( JSON.stringify(res) );
       res.status(403).send('Wrong mail or password');
       // console.log(JSON.stringify(err));
       // logger.info('user cannot be logged');
@@ -294,11 +407,12 @@ app.post('/addCurso', urlencodedParser, function (req, res) {
     descripcion: req.body.descripcion,
     tipoEntrenamiento: req.body.tipoEntrenamiento
   });
+  logger.info('curso be added');
 })
 
 /////////////////////////GET CURSOS/////////////////////////
 
-app.post('/getCursos', function (req, res) {
+app.get('/getCursos', function (req, res) {
 
   // jwt.verify(req.token, 'secretKey', (error, authData) => {
 
@@ -319,30 +433,41 @@ app.post('/getCursos', function (req, res) {
 
 app.post('/addTiempos', verifyToken, urlencodedParser, function (req, res) {
 
+  // logger.info(req.body.nombreUsuario+', '+req.body.tipoCurso+', '+req.body.dias+', '+req.body.horas+', '+req.body.minutos+', '+req.body.nombreCurso);
+  // logger.info(req.token);
 
+  // logger.info(req.token);
   jwt.verify(req.token, 'secretKey', (error, authData) => {
-
+    
     if (error) {
       logger.info(error);
       res.sendStatus(403);
     } else {
 
       dataTiemposInv.addTiempoInv(req.body.nombreUsuario, req.body.tipoCurso, req.body.dias, req.body.horas, req.body.minutos, req.body.nombreCurso)
+      // res.status(200);
+      // res.status(200).send('Success');
+      // res.sendStatus(200);
       res.send({
         nombreUsuario: req.body.nombreUsuario,
-        tipoCurso: req.body.tipoCurso,
-        dias: req.body.dias,
-        horas: req.body.horas,
-        minutos: req.body.minutos,
         nombreCurso: req.body.nombreCurso,
-      }).status(200);
+        }).status(200);
+      // console.log(authData);
+
+        // res.send(authData).status(200);
+
+
+
+
+      logger.info('times sent');
+
     }
   })
 });
 
 /////////////////////////GET TIEMPOS/////////////////////////
 
-app.post('/getTiempos', function (req, res) {
+app.get('/getTiempos', function (req, res) {
 
   // jwt.verify(req.token, 'secretKey', (error, authData) => {
 
@@ -352,8 +477,9 @@ app.post('/getTiempos', function (req, res) {
 
       /////GETTING TIEMPOS//////////
       dataTiemposInv.TiempoInv.find(function (e, tim) {
-        res.send(tim);
+        res.send(tim).status(200);
         // console.log(usr);
+        logger.info('time inverted be sent');
       });
   //   }
   // })
