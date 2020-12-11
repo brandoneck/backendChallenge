@@ -437,13 +437,9 @@ app.post('/addTiempos', verifyToken, urlencodedParser, function (req, res) {
   // logger.info(req.token);
 
   // logger.info(req.token);
-  jwt.verify(req.token, 'secretKey', (error, authData) => {
+  jwt.verify(req.token, 'secretKey', (err, authData) => {
     
-    if (error) {
-      logger.info(error);
-      res.sendStatus(403);
-    } else {
-
+    if (authData) {
       dataTiemposInv.addTiempoInv(req.body.nombreUsuario, req.body.tipoCurso, req.body.dias, req.body.horas, req.body.minutos, req.body.nombreCurso)
       // res.status(200);
       // res.status(200).send('Success');
@@ -452,6 +448,11 @@ app.post('/addTiempos', verifyToken, urlencodedParser, function (req, res) {
         nombreUsuario: req.body.nombreUsuario,
         nombreCurso: req.body.nombreCurso,
         }).status(200);
+
+        res.status(200).json({
+          nombreUsuario: req.body.nombreUsuario,
+          nombreCurso: req.body.nombreCurso,
+        });
       // console.log(authData);
 
         // res.send(authData).status(200);
@@ -459,7 +460,11 @@ app.post('/addTiempos', verifyToken, urlencodedParser, function (req, res) {
 
 
 
-      logger.info('times sent');
+      // logger.info('times sent');
+    } else {
+
+      logger.info(err);
+      res.sendStatus(403);
 
     }
   })

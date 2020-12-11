@@ -17,7 +17,7 @@ describe('Tasks Api', () => {
         it("it should get the users list", () => {
             chai.request(app)
                 // .post('/getUsers')
-                .post('/getUsers')
+                .get('/getUsers')
                 .end((err, response) => {
                     response.should.have.status(200);
                     response.body.should.be.a('array');
@@ -47,11 +47,13 @@ describe('Tasks Api', () => {
     describe("GET /getCursos", () => {
         it("it should get the courses list", () => {
             chai.request(app)
-                .post('/getCursos')
-                .end((err, response) => {
-                    response.should.have.status(200);
-                    response.body.should.be.a('array');
+                .get('/getCursos')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('array');
 
+                    // logger.info(response);
+                    logger.info(res);
                     done();
                 })
         })
@@ -61,7 +63,7 @@ describe('Tasks Api', () => {
     describe("GET /getTiempos", () => {
         it("it should get the times list of the different courses", () => {
             chai.request(app)
-                .post('/getTiempos')
+                .get('/getTiempos')
                 .end((err, response) => {
                     response.should.have.status(200);
                     response.body.should.be.a('array');
@@ -77,10 +79,10 @@ describe('Tasks Api', () => {
         it("it should insert the inverted time on a specific course",  () => {
             chai.request(app)
                 .post('/addTiempos')
-                .type('form')
                 .set('Content-Type', 'application/x-www-form-urlencoded')
                 // .set( 'Authorization', 'Bearer ' + token )
                 .set({'Authorization': 'Bearer ' + token })
+                .type('form')
                 .send({
                     nombreUsuario: 'Tu conciencia',
                     tipoCurso: 'Talleres',
@@ -92,6 +94,7 @@ describe('Tasks Api', () => {
                 .end((err, res) => {
                     response.should.have.status(200);
                     response.body.should.be.a('array');
+                    logger.info(res);
 
                     done();
                 });
